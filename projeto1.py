@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import openpyxl
 # Função para carregar o banco de ideias
 def load_data(ideias):
     return pd.read_excel(ideias)
