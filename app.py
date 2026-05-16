@@ -409,10 +409,4 @@ status, período, famílias beneficiadas, área protegida e execução física.
 **Protótipo conceitual desenvolvido para demonstração técnica de monitoramento territorial e visualização estratégica de projetos socioambientais.**
 """)
 
-!streamlit run app.py --server.port 8501 --server.address 0.0.0.0 &>/content/logs.txt &
 
-from pyngrok import ngrok
-
-ngrok.kill()
-public_url = ngrok.connect(8501)
-print(public_url)
