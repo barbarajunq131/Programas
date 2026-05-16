@@ -14,7 +14,7 @@ st.markdown("""
     background: linear-gradient(135deg, #08120D 0%, #10261A 100%);
 }
 h1, h2, h3, h4, h5, h6, p, label, span {
-    color: #F5F5F5 !important;
+    color: #cccccc !important;
 }
 section[data-testid="stSidebar"] {
     background-color: #071014 !important;
