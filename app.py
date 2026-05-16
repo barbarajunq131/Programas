@@ -2,89 +2,37 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 
-# ---------------------------------------------------
-# CONFIGURAÇÃO DA PÁGINA
-# ---------------------------------------------------
-
 st.set_page_config(
     page_title="Observatório Territorial de Projetos",
     page_icon="🌎",
     layout="wide"
 )
 
-# ---------------------------------------------------
-# CSS
-# ---------------------------------------------------
-
 st.markdown("""
 <style>
-
-/* FUNDO GERAL */
-
 .stApp {
     background: linear-gradient(135deg, #08120D 0%, #10261A 100%);
 }
 
-/* TEXTO */
-
-h1, h2, h3, h4, h5, h6, p, span, label, div {
+h1, h2, h3, h4, h5, h6, p, label, span {
     color: #F5F5F5 !important;
 }
-
-/* SIDEBAR */
 
 section[data-testid="stSidebar"] {
     background-color: #071014 !important;
     border-right: 1px solid #1E2A2E;
 }
 
-/* TEXTO SIDEBAR */
-
 section[data-testid="stSidebar"] * {
     color: #F5F5F5 !important;
 }
 
-/* SELECTBOX */
-
-div[data-baseweb="select"] {
-    background-color: #11191D !important;
-    border-radius: 10px !important;
-    border: 1px solid #2B353A !important;
-}
-
-/* TEXTO DO SELECTBOX */
-
-div[data-baseweb="select"] span {
-    color: #F5F5F5 !important;
-}
-
-div[data-baseweb="select"] input {
-    color: #F5F5F5 !important;
-}
-
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] input,
 div[data-baseweb="select"] svg {
+    color: #F5F5F5 !important;
     fill: #F5F5F5 !important;
 }
-
-/* DROPDOWN */
-
-ul[role="listbox"] {
-    background-color: #11191D !important;
-}
-
-li[role="option"] {
-    background-color: #11191D !important;
-    color: #F5F5F5 !important;
-}
-
-/* TAGS MULTISELECT */
-
-span[data-baseweb="tag"] {
-    background-color: #2E7D32 !important;
-    color: white !important;
-}
-
-/* MÉTRICAS */
 
 [data-testid="stMetric"] {
     background-color: rgba(17,25,29,0.95);
@@ -93,7 +41,9 @@ span[data-baseweb="tag"] {
     padding: 14px;
 }
 
-/* DATAFRAME */
+.block-container {
+    padding-top: 1.5rem;
+}
 
 [data-testid="stDataFrame"] {
     background-color: #11191D;
@@ -101,13 +51,9 @@ span[data-baseweb="tag"] {
     border: 1px solid #2B353A;
 }
 
-/* TOPO */
-
 header[data-testid="stHeader"] {
     background: transparent;
 }
-
-/* ESCONDER MENU */
 
 #MainMenu {
     visibility: hidden;
@@ -117,18 +63,11 @@ footer {
     visibility: hidden;
 }
 
-/* LINKS */
-
 a {
     color: #81C784 !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
-
-# ---------------------------------------------------
-# DADOS FICTÍCIOS
-# ---------------------------------------------------
 
 dados = pd.DataFrame({
     "Território": [
@@ -138,153 +77,63 @@ dados = pd.DataFrame({
         "Yanomami", "Yanomami", "Yanomami",
         "Vale do Javari", "Vale do Javari", "Vale do Javari"
     ],
-
     "Categoria": [
-        "Monitoramento territorial",
-        "Bioeconomia",
-        "Fortalecimento institucional",
-
-        "Monitoramento territorial",
-        "Proteção florestal",
-        "Segurança alimentar",
-
-        "Bioeconomia",
-        "Proteção florestal",
-        "Fortalecimento institucional",
-
-        "Monitoramento territorial",
-        "Saúde territorial",
-        "Proteção florestal",
-
-        "Proteção florestal",
-        "Segurança alimentar",
-        "Fortalecimento institucional"
+        "Monitoramento territorial", "Bioeconomia", "Fortalecimento institucional",
+        "Monitoramento territorial", "Proteção florestal", "Segurança alimentar",
+        "Bioeconomia", "Proteção florestal", "Fortalecimento institucional",
+        "Monitoramento territorial", "Saúde territorial", "Proteção florestal",
+        "Proteção florestal", "Segurança alimentar", "Fortalecimento institucional"
     ],
-
     "Status": [
-        "Em andamento",
-        "Concluído",
-        "Em planejamento",
-
-        "Em andamento",
-        "Em andamento",
-        "Concluído",
-
-        "Concluído",
-        "Em andamento",
-        "Em planejamento",
-
-        "Em andamento",
-        "Em planejamento",
-        "Em andamento",
-
-        "Em andamento",
-        "Concluído",
-        "Em planejamento"
+        "Em andamento", "Concluído", "Em planejamento",
+        "Em andamento", "Em andamento", "Concluído",
+        "Concluído", "Em andamento", "Em planejamento",
+        "Em andamento", "Em planejamento", "Em andamento",
+        "Em andamento", "Concluído", "Em planejamento"
     ],
-
-    "Projetos": [5,4,3,7,6,5,4,4,2,3,2,2,4,3,2],
-
-    "Famílias Beneficiadas": [
-        1600,1400,1200,
-        2500,2100,1500,
-        1300,1500,700,
-        900,600,600,
-        1200,900,700
-    ],
-
-    "Área Protegida (ha)": [
-        620000,510000,370000,
-        950000,870000,580000,
-        370000,410000,200000,
-        510000,320000,370000,
-        700000,620000,430000
-    ],
-
-    "Execução (%)": [
-        72,100,25,
-        68,54,100,
-        100,61,30,
-        49,22,58,
-        63,100,34
-    ],
-
-    "Ano": [
-        2022,2023,2024,
-        2022,2023,2024,
-        2022,2023,2024,
-        2022,2023,2024,
-        2022,2023,2024
-    ]
+    "Projetos": [5, 4, 3, 7, 6, 5, 4, 4, 2, 3, 2, 2, 4, 3, 2],
+    "Famílias Beneficiadas": [1600, 1400, 1200, 2500, 2100, 1500, 1300, 1500, 700, 900, 600, 600, 1200, 900, 700],
+    "Área Protegida (ha)": [620000, 510000, 370000, 950000, 870000, 580000, 370000, 410000, 200000, 510000, 320000, 370000, 700000, 620000, 430000],
+    "Execução (%)": [72, 100, 25, 68, 54, 100, 100, 61, 30, 49, 22, 58, 63, 100, 34],
+    "Ano": [2022, 2023, 2024, 2022, 2023, 2024, 2022, 2023, 2024, 2022, 2023, 2024, 2022, 2023, 2024]
 })
 
 mapa = pd.DataFrame({
-    "Território": [
-        "Alto Rio Negro",
-        "Xingu",
-        "Tapajós",
-        "Yanomami",
-        "Vale do Javari"
-    ],
-
-    "lat": [
-        -0.1807,
-        -11.1800,
-        -3.4653,
-        2.8200,
-        -4.5000
-    ],
-
-    "lon": [
-        -66.5000,
-        -53.2000,
-        -55.0000,
-        -63.1300,
-        -71.0000
-    ]
+    "Território": ["Alto Rio Negro", "Xingu", "Tapajós", "Yanomami", "Vale do Javari"],
+    "lat": [-0.1807, -11.1800, -3.4653, 2.8200, -4.5000],
+    "lon": [-66.5000, -53.2000, -55.0000, -63.1300, -71.0000]
 })
 
-# ---------------------------------------------------
-# SIDEBAR
-# ---------------------------------------------------
-
 st.sidebar.markdown("## Vivi Assessoria Antropológica")
-
-st.sidebar.markdown("""
-Protótipo conceitual para monitoramento territorial
-e visualização estratégica de projetos socioambientais.
-""")
+st.sidebar.markdown("Protótipo conceitual para monitoramento territorial e visualização estratégica.")
 
 territorio = st.sidebar.selectbox(
     "Território",
-    ["Todos"] + sorted(dados["Território"].unique())
+    ["Todos"] + sorted(dados["Território"].unique()),
+    key="territorio_filtro"
 )
 
 categoria = st.sidebar.multiselect(
     "Categoria",
     sorted(dados["Categoria"].unique()),
-    default=sorted(dados["Categoria"].unique())
+    default=sorted(dados["Categoria"].unique()),
+    key="categoria_filtro"
 )
 
 status = st.sidebar.multiselect(
     "Status",
     sorted(dados["Status"].unique()),
-    default=sorted(dados["Status"].unique())
+    default=sorted(dados["Status"].unique()),
+    key="status_filtro"
 )
 
 ano = st.sidebar.slider(
     "Ano",
     int(dados["Ano"].min()),
     int(dados["Ano"].max()),
-    (
-        int(dados["Ano"].min()),
-        int(dados["Ano"].max())
-    )
+    (int(dados["Ano"].min()), int(dados["Ano"].max())),
+    key="ano_filtro"
 )
-
-# ---------------------------------------------------
-# FILTROS
-# ---------------------------------------------------
 
 df = dados.copy()
 
@@ -292,103 +141,43 @@ if territorio != "Todos":
     df = df[df["Território"] == territorio]
 
 df = df[
-    (df["Categoria"].isin(categoria))
-    &
-    (df["Status"].isin(status))
-    &
-    (df["Ano"].between(ano[0], ano[1]))
+    df["Categoria"].isin(categoria)
+    & df["Status"].isin(status)
+    & df["Ano"].between(ano[0], ano[1])
 ]
 
-mapa_filtrado = mapa[
-    mapa["Território"].isin(df["Território"].unique())
-]
-
-# ---------------------------------------------------
-# CABEÇALHO
-# ---------------------------------------------------
+mapa_filtrado = mapa[mapa["Território"].isin(df["Território"].unique())]
 
 st.title("Observatório Territorial de Projetos Socioambientais")
-
-st.markdown("""
-Dashboard demonstrativo para acompanhamento de projetos,
-territórios, indicadores e execução física.
-""")
-
-st.caption("""
-Protótipo conceitual com dados fictícios para demonstração técnica.
-""")
-
-# ---------------------------------------------------
-# KPIs
-# ---------------------------------------------------
+st.markdown("Dashboard demonstrativo para acompanhamento de projetos, territórios, indicadores e execução física.")
+st.caption("Protótipo conceitual com dados fictícios para demonstração técnica.")
 
 total_projetos = int(df["Projetos"].sum()) if not df.empty else 0
-
-total_territorios = (
-    df["Território"].nunique()
-    if not df.empty else 0
-)
-
-total_familias = (
-    int(df["Famílias Beneficiadas"].sum())
-    if not df.empty else 0
-)
-
-total_area = (
-    int(df["Área Protegida (ha)"].sum())
-    if not df.empty else 0
-)
-
-media_execucao = (
-    df["Execução (%)"].mean()
-    if not df.empty else 0
-)
+total_territorios = df["Território"].nunique() if not df.empty else 0
+total_familias = int(df["Famílias Beneficiadas"].sum()) if not df.empty else 0
+total_area = int(df["Área Protegida (ha)"].sum()) if not df.empty else 0
+media_execucao = df["Execução (%)"].mean() if not df.empty else 0
 
 c1, c2, c3, c4, c5 = st.columns(5)
 
-c1.metric(
-    "Projetos monitorados",
-    total_projetos
-)
+c1.metric("Projetos monitorados", total_projetos)
+c2.metric("Territórios", total_territorios)
+c3.metric("Famílias beneficiadas", f"{total_familias:,}".replace(",", "."))
+c4.metric("Área protegida", f"{total_area/1000000:.2f} mi ha".replace(".", ","))
+c5.metric("Execução média", f"{media_execucao:.1f}%".replace(".", ","))
 
-c2.metric(
-    "Territórios",
-    total_territorios
-)
-
-c3.metric(
-    "Famílias beneficiadas",
-    f"{total_familias:,}".replace(",", ".")
-)
-
-c4.metric(
-    "Área protegida",
-    f"{total_area/1000000:.2f} mi ha".replace(".", ",")
-)
-
-c5.metric(
-    "Execução média",
-    f"{media_execucao:.1f}%".replace(".", ",")
-)
-
-# ---------------------------------------------------
-# MAPA + LEITURA
-# ---------------------------------------------------
-
-col1, col2 = st.columns([1, 1.5])
+col1, col2 = st.columns([1, 1.6])
 
 with col1:
-
     st.subheader("Mapa territorial")
 
     if not mapa_filtrado.empty:
-
         layer = pdk.Layer(
             "ScatterplotLayer",
             data=mapa_filtrado,
-            get_position="[lon, lat]",
+            get_position='[lon, lat]',
             get_radius=70000,
-            get_fill_color="[67,160,71,190]",
+            get_fill_color='[67, 160, 71, 190]',
             pickable=True
         )
 
@@ -405,106 +194,68 @@ with col1:
             tooltip={"text": "{Território}"}
         )
 
-        st.pydeck_chart(
-            deck,
-            use_container_width=True
-        )
+        st.pydeck_chart(deck, use_container_width=True, height=300)
+    else:
+        st.warning("Nenhum território encontrado para os filtros selecionados.")
 
 with col2:
-
     st.subheader("Leitura executiva")
 
     if not df.empty:
+        territorio_txt = territorio if territorio != "Todos" else "os territórios selecionados"
 
-        territorio_txt = (
-            territorio
-            if territorio != "Todos"
-            else "os territórios selecionados"
+        st.markdown(
+            f"""
+            Para **{territorio_txt}**, o painel apresenta **{total_projetos} projetos monitorados**,
+            com **{total_familias:,} famílias beneficiadas** e aproximadamente
+            **{total_area:,} hectares** abrangidos por ações socioambientais.
+            """.replace(",", ".")
         )
 
-        st.markdown(f"""
-Para **{territorio_txt}**, o painel apresenta
-**{total_projetos} projetos monitorados**,
-beneficiando aproximadamente
-**{total_familias:,} famílias**
-e abrangendo cerca de
-**{total_area:,} hectares**.
-""".replace(",", "."))
-
-        st.progress(
-            min(int(media_execucao),100)/100
-        )
-
-        st.caption(
-            f"Execução média: {media_execucao:.1f}%".replace(".", ",")
-        )
-
-# ---------------------------------------------------
-# GRÁFICOS
-# ---------------------------------------------------
+        st.progress(min(int(media_execucao), 100) / 100)
+        st.caption(f"Execução média dos projetos filtrados: {media_execucao:.1f}%".replace(".", ","))
+    else:
+        st.warning("Ajuste os filtros para visualizar a análise.")
 
 g1, g2 = st.columns(2)
 
 with g1:
-
     st.subheader("Projetos por categoria")
 
     if not df.empty:
-
-        resumo_categoria = (
-            df.groupby("Categoria")["Projetos"]
-            .sum()
-            .sort_values()
-        )
-
+        resumo_categoria = df.groupby("Categoria")["Projetos"].sum().sort_values()
         st.bar_chart(resumo_categoria)
+    else:
+        st.info("Sem dados para o filtro selecionado.")
 
 with g2:
-
     st.subheader("Projetos por status")
 
     if not df.empty:
-
-        resumo_status = (
-            df.groupby("Status")["Projetos"]
-            .sum()
-            .sort_values()
-        )
-
+        resumo_status = df.groupby("Status")["Projetos"].sum().sort_values()
         st.bar_chart(resumo_status)
+    else:
+        st.info("Sem dados para o filtro selecionado.")
 
 g3, g4 = st.columns(2)
 
 with g3:
-
-    st.subheader("Evolução dos projetos")
+    st.subheader("Evolução dos projetos monitorados")
 
     if not df.empty:
-
-        evolucao = (
-            df.groupby("Ano")["Projetos"]
-            .sum()
-        )
-
+        evolucao = df.groupby("Ano")["Projetos"].sum()
         st.line_chart(evolucao)
+    else:
+        st.info("Sem dados para o filtro selecionado.")
 
 with g4:
-
     st.subheader("Execução média por território")
 
     if not df.empty:
-
-        execucao = (
-            df.groupby("Território")["Execução (%)"]
-            .mean()
-            .sort_values()
-        )
-
+        execucao = df.groupby("Território")["Execução (%)"].mean().sort_values()
         st.bar_chart(execucao)
-
-# ---------------------------------------------------
-# TABELA
-# ---------------------------------------------------
+    else:
+        st.info("Sem dados para o filtro selecionado.")
 
 st.subheader("Base demonstrativa filtrada")
 
@@ -514,19 +265,13 @@ st.dataframe(
     hide_index=True
 )
 
-# ---------------------------------------------------
-# RODAPÉ
-# ---------------------------------------------------
-
 st.markdown("""
 ---
-
 ### Finalidade do protótipo
 
-Este painel demonstra uma solução possível para apoiar
-a organização, leitura e comunicação de informações
-de projetos socioambientais.
+Este painel demonstra uma solução possível para apoiar a organização, leitura e comunicação
+de informações de projetos socioambientais, permitindo análise por território, categoria,
+status, período, famílias beneficiadas, área protegida e execução física.
 
-Protótipo conceitual desenvolvido para demonstração técnica
-de monitoramento territorial e visualização estratégica.
+**Protótipo conceitual desenvolvido para demonstração técnica de monitoramento territorial e visualização estratégica de projetos socioambientais.**
 """)
