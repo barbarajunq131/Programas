@@ -27,11 +27,41 @@ section[data-testid="stSidebar"] * {
     color: #F5F5F5 !important;
 }
 
-div[data-baseweb="select"] span,
-div[data-baseweb="select"] input,
-div[data-baseweb="select"] svg {
+div[data-baseweb="select"] {
+    background-color: #11191D !important;
+    border-radius: 10px !important;
+    border: 1px solid #2B353A !important;
+}
+
+div[data-baseweb="select"] > div {
+    background-color: #11191D !important;
     color: #F5F5F5 !important;
-    fill: #F5F5F5 !important;
+}
+
+div[data-baseweb="popover"] {
+    background-color: #11191D !important;
+}
+
+ul[role="listbox"] {
+    background-color: #11191D !important;
+}
+
+li[role="option"] {
+    background-color: #11191D !important;
+    color: #F5F5F5 !important;
+}
+
+span[data-baseweb="tag"] {
+    background-color: #2E7D32 !important;
+    color: #FFFFFF !important;
+}
+
+.stRadio label {
+    color: #F5F5F5 !important;
+}
+
+.stSlider label, .stSlider span, .stSlider div {
+    color: #F5F5F5 !important;
 }
 
 [data-testid="stMetric"] {
