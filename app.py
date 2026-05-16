@@ -208,7 +208,7 @@ with col1:
             data=mapa_filtrado,
             get_position='[lon, lat]',
             get_radius=70000,
-            get_fill_color='[67, 160, 71, 190]',
+            get_fill_color='[124, 179, 66, 190]',
             pickable=True
         )
 
@@ -237,16 +237,41 @@ with col2:
 
         st.markdown(
             f"""
-            Para **{territorio_txt}**, o painel apresenta **{total_projetos} projetos monitorados**,
-            com **{total_familias:,} famílias beneficiadas** e aproximadamente
-            **{total_area:,} hectares** abrangidos por ações socioambientais.
-            """.replace(",", ".")
+            <div class="card-text">
+            Para <b>{territorio_txt}</b>, o painel apresenta <b>{total_projetos} projetos monitorados</b>,
+            com <b>{total_familias:,} famílias beneficiadas</b> e aproximadamente
+            <b>{total_area:,} hectares</b> abrangidos por ações socioambientais.
+            <br><br>
+            A execução média dos projetos filtrados é de <b>{media_execucao:.1f}%</b>.
+            </div>
+            """.replace(",", "."),
+            unsafe_allow_html=True
         )
 
         st.progress(min(int(media_execucao), 100) / 100)
-        st.caption(f"Execução média dos projetos filtrados: {media_execucao:.1f}%".replace(".", ","))
     else:
         st.warning("Ajuste os filtros para visualizar a análise.")
+
+def chart_base():
+    return (
+        alt.Chart()
+        .properties(height=340)
+        .configure_view(strokeWidth=0)
+        .configure_axis(
+            labelColor="#C8D6C9",
+            titleColor="#C8D6C9",
+            gridColor="#26352C"
+        )
+        .configure_title(
+            color="#F5F5F5",
+            fontSize=15,
+            anchor="start"
+        )
+        .configure_legend(
+            labelColor="#F5F5F5",
+            titleColor="#F5F5F5"
+        )
+    )
 
 g1, g2 = st.columns(2)
 
@@ -254,8 +279,32 @@ with g1:
     st.subheader("Projetos por categoria")
 
     if not df.empty:
-        resumo_categoria = df.groupby("Categoria")["Projetos"].sum().sort_values()
-        st.bar_chart(resumo_categoria)
+        resumo_categoria = (
+            df.groupby("Categoria", as_index=False)["Projetos"]
+            .sum()
+            .sort_values("Projetos", ascending=True)
+        )
+
+        chart = (
+            alt.Chart(resumo_categoria)
+            .mark_bar(cornerRadiusEnd=5)
+            .encode(
+                x=alt.X("Projetos:Q", title="Projetos"),
+                y=alt.Y("Categoria:N", sort="-x", title=""),
+                color=alt.Color(
+                    "Categoria:N",
+                    legend=None,
+                    scale=alt.Scale(range=["#7CB342", "#43A047", "#26A69A", "#A5D6A7", "#FFB74D"])
+                ),
+                tooltip=["Categoria", "Projetos"]
+            )
+            .properties(height=360)
+            .configure_view(strokeWidth=0)
+            .configure_axis(labelColor="#C8D6C9", titleColor="#C8D6C9", gridColor="#26352C")
+            .configure(background="#11191D")
+        )
+
+        st.altair_chart(chart, use_container_width=True)
     else:
         st.info("Sem dados para o filtro selecionado.")
 
@@ -263,8 +312,30 @@ with g2:
     st.subheader("Projetos por status")
 
     if not df.empty:
-        resumo_status = df.groupby("Status")["Projetos"].sum().sort_values()
-        st.bar_chart(resumo_status)
+        resumo_status = df.groupby("Status", as_index=False)["Projetos"].sum()
+
+        chart = (
+            alt.Chart(resumo_status)
+            .mark_arc(innerRadius=65, outerRadius=130)
+            .encode(
+                theta=alt.Theta("Projetos:Q"),
+                color=alt.Color(
+                    "Status:N",
+                    scale=alt.Scale(
+                        domain=["Concluído", "Em andamento", "Em planejamento"],
+                        range=["#7CB342", "#1E88E5", "#FFB74D"]
+                    ),
+                    legend=alt.Legend(orient="bottom")
+                ),
+                tooltip=["Status", "Projetos"]
+            )
+            .properties(height=360)
+            .configure_view(strokeWidth=0)
+            .configure_legend(labelColor="#F5F5F5", titleColor="#F5F5F5")
+            .configure(background="#11191D")
+        )
+
+        st.altair_chart(chart, use_container_width=True)
     else:
         st.info("Sem dados para o filtro selecionado.")
 
@@ -274,8 +345,23 @@ with g3:
     st.subheader("Evolução dos projetos monitorados")
 
     if not df.empty:
-        evolucao = df.groupby("Ano")["Projetos"].sum()
-        st.line_chart(evolucao)
+        evolucao = df.groupby("Ano", as_index=False)["Projetos"].sum()
+
+        line = (
+            alt.Chart(evolucao)
+            .mark_line(point=True, strokeWidth=3, color="#81C784")
+            .encode(
+                x=alt.X("Ano:O", title="Ano"),
+                y=alt.Y("Projetos:Q", title="Projetos"),
+                tooltip=["Ano", "Projetos"]
+            )
+            .properties(height=340)
+            .configure_view(strokeWidth=0)
+            .configure_axis(labelColor="#C8D6C9", titleColor="#C8D6C9", gridColor="#26352C")
+            .configure(background="#11191D")
+        )
+
+        st.altair_chart(line, use_container_width=True)
     else:
         st.info("Sem dados para o filtro selecionado.")
 
@@ -283,8 +369,24 @@ with g4:
     st.subheader("Execução média por território")
 
     if not df.empty:
-        execucao = df.groupby("Território")["Execução (%)"].mean().sort_values()
-        st.bar_chart(execucao)
+        execucao = df.groupby("Território", as_index=False)["Execução (%)"].mean()
+
+        bars = (
+            alt.Chart(execucao)
+            .mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5)
+            .encode(
+                x=alt.X("Território:N", title=""),
+                y=alt.Y("Execução (%):Q", title="Execução (%)", scale=alt.Scale(domain=[0, 100])),
+                color=alt.value("#1E88E5"),
+                tooltip=["Território", alt.Tooltip("Execução (%):Q", format=".1f")]
+            )
+            .properties(height=340)
+            .configure_view(strokeWidth=0)
+            .configure_axis(labelColor="#C8D6C9", titleColor="#C8D6C9", gridColor="#26352C")
+            .configure(background="#11191D")
+        )
+
+        st.altair_chart(bars, use_container_width=True)
     else:
         st.info("Sem dados para o filtro selecionado.")
 
